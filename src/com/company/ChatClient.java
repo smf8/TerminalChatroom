@@ -13,13 +13,6 @@ public class ChatClient {
         Scanner localReader = new Scanner(System.in);
         System.out.print("Enter name : ");
         String name = localReader.next();
-
-        PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println(name);
-        while(!name.equals("/exit")){
-            writer.println(name);
-        }
-        System.out.println("Exitting...");
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         new Thread(new Runnable() {
             @Override
@@ -35,5 +28,14 @@ public class ChatClient {
                 }
             }
         }).start();
+
+        PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+        writer.println(name);
+        while(!name.equals("/exit")){
+            name = localReader.nextLine();
+            writer.println(name);
+        }
+        System.out.println("Exitting...");
+        System.exit(0);
     }
 }
