@@ -12,11 +12,29 @@ public class ChatHandler implements Runnable {
     private PrintWriter writer;
     private BufferedReader reader;
     private String username;
-    ArrayList<String> usernames;
+    private Socket socket;
+    ArrayList<String> usernames = new ArrayList<>();
     private static ArrayList<PrintWriter> userWriters = new ArrayList<>();
 
     @Override
     public void run() {
+
+        try {
+            this.writer = new PrintWriter(socket.getOutputStream(), true);
+            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            this.username = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("User " + username + " connected");
+        synchronized (usernames){
+            usernames.add(username);
+        }
+        userWriters.add(writer);
         while (true){
             String input = null;
             while(true){
@@ -33,9 +51,6 @@ public class ChatHandler implements Runnable {
     }
 
     public ChatHandler(Socket socket) throws IOException {
-        this.writer = new PrintWriter(socket.getOutputStream(), true);
-        this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.username = reader.readLine();
-        userWriters.add(writer);
+        this.socket = socket;
     }
 }
