@@ -22,30 +22,51 @@ public class ChatHandler implements Runnable {
         try {
             this.writer = new PrintWriter(socket.getOutputStream(), true);
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            this.username = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("User " + username + " connected");
-        synchronized (usernames){
-            usernames.add(username);
-        }
-        userWriters.add(writer);
-        while (true){
-            String input = null;
-            while(true){
-                try {
-                    if (!((input = reader.readLine()) != null)) break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                    for (PrintWriter printWriter : userWriters){
-                        printWriter.println(username  + " : " + input);
+            try {
+                this.username = reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("User " + username + " connected");
+            synchronized (usernames) {
+                usernames.add(username);
+            }
+            userWriters.add(writer);
+            while (true) {
+                String input = null;
+                while (true) {
+                    try {
+                        if (!((input = reader.readLine()) != null)) break;
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    if (input.equals("--exit--")){
+                        System.out.println("--exit-- " +username);
+//                        socket.close();
+//                        reader.close();
+//                        writer.close();
+//                        userWriters.remove(writer);
+                        return;
+                    }
+                    for (PrintWriter printWriter : userWriters) {
+                        printWriter.println(username + " : " + input);
+                    }
+                }
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            if (writer != null)
+                userWriters.remove(writer);
+            System.out.println("Client quited :" +username);
+            System.out.println(userWriters.size() + " " + usernames.size());
+            for (PrintWriter printWriter : userWriters) {
+                printWriter.println("--" + username + "--" + " has left");
+            }
+                try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

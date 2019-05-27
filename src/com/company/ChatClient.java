@@ -36,6 +36,7 @@ public class ChatClient {
             writer.println(name);
         }
         System.out.println("Exitting...");
+        writer.println("--exit--");
         System.exit(0);
     }
 }
