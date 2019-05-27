@@ -20,6 +20,7 @@ public class ChatHandler implements Runnable {
     public void run() {
 
         try {
+            // simple PrintWriter and BufferedReader is used to write and read data to/from streams
             this.writer = new PrintWriter(socket.getOutputStream(), true);
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             try {
@@ -28,10 +29,12 @@ public class ChatHandler implements Runnable {
                 e.printStackTrace();
             }
             System.out.println("User " + username + " connected");
+            // avoid array list from being updated at the same time by different threads
             synchronized (usernames) {
                 usernames.add(username);
             }
             userWriters.add(writer);
+            // reading socket inputs from stream
             while (true) {
                 String input = null;
                 while (true) {
@@ -42,10 +45,6 @@ public class ChatHandler implements Runnable {
                     }
                     if (input.equals("--exit--")){
                         System.out.println("--exit-- " +username);
-//                        socket.close();
-//                        reader.close();
-//                        writer.close();
-//                        userWriters.remove(writer);
                         return;
                     }
                     for (PrintWriter printWriter : userWriters) {
@@ -56,6 +55,7 @@ public class ChatHandler implements Runnable {
         }catch (IOException e){
             e.printStackTrace();
         }finally {
+            // closing streams and socket on user exit
             if (writer != null)
                 userWriters.remove(writer);
             System.out.println("Client quited :" +username);
@@ -64,6 +64,8 @@ public class ChatHandler implements Runnable {
                 printWriter.println("--" + username + "--" + " has left");
             }
                 try {
+                    writer.close();
+                    reader.close();
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();

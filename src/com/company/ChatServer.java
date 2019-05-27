@@ -9,6 +9,7 @@ public class ChatServer {
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(8585);
+        // use a thread pool to handle user interactions in server
         var threadPool = Executors.newFixedThreadPool(10);
         while(true){
             threadPool.execute(new ChatHandler(serverSocket.accept()));

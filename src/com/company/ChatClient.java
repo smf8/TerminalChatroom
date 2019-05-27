@@ -13,6 +13,7 @@ public class ChatClient {
         Scanner localReader = new Scanner(System.in);
         System.out.print("Enter name : ");
         String name = localReader.next();
+        // creating a new thread for displaying incoming messages
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         new Thread(new Runnable() {
             @Override
@@ -28,7 +29,7 @@ public class ChatClient {
                 }
             }
         }).start();
-
+        // main thread is used for reading standard input and writing to stream
         PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
         writer.println(name);
         while(!name.equals("/exit")){
